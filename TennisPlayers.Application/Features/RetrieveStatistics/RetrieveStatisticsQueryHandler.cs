@@ -17,7 +17,7 @@ public class RetrieveStatisticsQueryHandler(ITennisPlayersRepository tennisPlaye
         var countryStats = players.GroupBy(p => p.Country.Code).Select(g => new
         {
             Country = g.Key,
-            WinRatio = g.Sum(p => p.Data.Last.Count(l => l == 1)) / g.Sum(p => p.Data.Last.Count())
+            WinRatio = g.Sum(p => p.Data.Last.Count(l => l == 1)) / (double)g.Sum(p => p.Data.Last.Count())
         })
         .OrderByDescending(c => c.WinRatio)
         .FirstOrDefault();
