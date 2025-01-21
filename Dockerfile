@@ -1,32 +1,32 @@
-# Use the official .NET 8.0 runtime as the base image
+# Step 1: Build stage using .NET SDK image
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Copy the solution and project files into the container
+COPY ["TennisPlayers.sln", "./"]
+COPY ["TennisPlayers/TennisPlayers.csproj", "TennisPlayers/"]
+COPY ["TennisPlayers.Application/TennisPlayers.Application.csproj", "TennisPlayers.Application/"]
+COPY ["TennisPlayers.Domain/TennisPlayers.Domain.csproj", "TennisPlayers.Domain/"]
+COPY ["TennisPlayers.Infrastructure/TennisPlayers.Infrastructure.csproj", "TennisPlayers.Infrastructure/"]
+COPY ["TennisPlayers.UnitTests/TennisPlayers.UnitTests.csproj", "TennisPlayers.UnitTests/"]
+COPY ["TennisPlayers.Infrastructure/headtohead.json", "TennisPlayers.Infrastructure/"]
+
+# Restore all dependencies for the solution
+RUN dotnet restore "TennisPlayers.sln"
+
+# Copy the entire source code into the container
+COPY . .
+
+# Step 2: Publish the application (main project)
+RUN dotnet publish "TennisPlayers/TennisPlayers.csproj" -c Release -o /app/publish
+
+# Step 3: Final image for running the app using the .NET runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 80
-EXPOSE 443
 
-# Use the .NET 8.0 SDK for building the application
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /
+# Copy the published application from the build stage
+COPY --from=build /app/publish .
 
-# Copy solution file and restore dependencies
-COPY ["TennisPlayers.sln", "./"]
-COPY ["TennisPlayers.Application/TennisPlayers.Application.csproj", "TennisPlayers.Application/"]
-COPY ["TennisPlayers.Infrastructure/TennisPlayers.Infrastructure.csproj", "TennisPlayers.Infrastructure/"]
-COPY ["TennisPlayers.Domain/TennisPlayers.Domain.csproj", "TennisPlayers.Domain/"]
-COPY ["TennisPlayers.UnitTests/TennisPlayers.UnitTests.csproj", "TennisPlayers.UnitTests/"]
-RUN dotnet restore
-
-# Copy the rest of the app and build it
-COPY . .
-WORKDIR "/TennisPlayers"
-RUN dotnet build -c Release -o /app/build
-
-# Publish the app to a runtime image
-FROM build AS publish
-RUN dotnet publish -c Release -o /app/publish
-
-# Final runtime image
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
+# Set the entry point for running the application
 ENTRYPOINT ["dotnet", "TennisPlayers.dll"]
