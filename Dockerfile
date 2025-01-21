@@ -6,7 +6,7 @@ EXPOSE 443
 
 # Use the .NET 8.0 SDK for building the application
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src
+WORKDIR /
 
 # Copy solution file and restore dependencies
 COPY ["TennisPlayers.sln", "./"]
@@ -18,7 +18,7 @@ RUN dotnet restore
 
 # Copy the rest of the app and build it
 COPY . .
-WORKDIR "/src/TennisPlayers"
+WORKDIR "/TennisPlayers"
 RUN dotnet build -c Release -o /app/build
 
 # Publish the app to a runtime image
