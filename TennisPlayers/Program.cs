@@ -1,12 +1,13 @@
 using TennisPlayers.Middlewares;
 using TennisPlayers.Infrastructure;
+using TennisPlayers.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerConfiguration();
 builder.Services.AddScoped<ExceptionMiddleware>();
 builder.Services.AddInfrastructure();
 
@@ -17,14 +18,8 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
-else
-{
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
-}
 
-app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerConfiguration();
 
 // Use custom exception middleware
 app.UseMiddleware<ExceptionMiddleware>();
