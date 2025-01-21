@@ -10,13 +10,10 @@ WORKDIR /
 
 # Copy solution file and restore dependencies
 COPY ["TennisPlayers.sln", "./"]
-COPY ["Controllers/", "Controllers/"]
-COPY ["Middlewares/", "Middlewares/"]
-COPY ["Properties/", "Properties/"]
-COPY ["Program.cs", "./"]
-COPY ["TennisPlayers.csproj", "./"]
-COPY ["appsettings.Development.json", "./"]
-COPY ["appsettings.json", "./"]
+COPY ["TennisPlayers.Application/TennisPlayers.Application.csproj", "TennisPlayers.Application/"]
+COPY ["TennisPlayers.Infrastructure/TennisPlayers.Infrastructure.csproj", "TennisPlayers.Infrastructure/"]
+COPY ["TennisPlayers.Domain/TennisPlayers.Domain.csproj", "TennisPlayers.Domain/"]
+COPY ["TennisPlayers.UnitTests/TennisPlayers.UnitTests.csproj", "TennisPlayers.UnitTests/"]
 RUN dotnet restore
 
 # Copy the rest of the app and build it
